@@ -39,6 +39,7 @@ class DatabaseHelper {
       date INTEGER DEFAULT 0,
       time INTEGER DEFAULT 0,
       type INTEGER DEFAULT 0,
+      meal INTEGER DEFAULT 0,
       kcal INTEGER DEFAULT 0,
       image String,
       memo String,

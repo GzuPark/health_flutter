@@ -1,17 +1,19 @@
 class Food {
-  int id;
+  int? id;
   int date;
   int time;
   int type;
+  int meal;
   int? kcal;
   String? memo;
   String? image;
 
   Food({
-    required this.id,
+    this.id,
     required this.date,
     required this.time,
     required this.type,
+    required this.meal,
     this.kcal,
     this.image,
     this.memo,
@@ -23,6 +25,7 @@ class Food {
       date: data['date'],
       time: data['time'],
       type: data['type'],
+      meal: data['meal'],
       kcal: data['kcal'],
       image: data['image'],
       memo: data['memo'],
@@ -35,6 +38,7 @@ class Food {
       'date': date,
       'time': time,
       'type': type,
+      'meal': meal,
       'kcal': kcal,
       'image': image,
       'memo': memo,
@@ -43,7 +47,7 @@ class Food {
 }
 
 class Workout {
-  int id;
+  int? id;
   int date;
   int time;
   int kcal;
@@ -53,7 +57,7 @@ class Workout {
   String? memo;
 
   Workout({
-    required this.id,
+    this.id,
     required this.date,
     required this.time,
     required this.kcal,
@@ -91,13 +95,13 @@ class Workout {
 }
 
 class EyeBody {
-  int id;
+  int? id;
   int date;
   String? image;
   String? memo;
 
   EyeBody({
-    required this.id,
+    this.id,
     required this.date,
     this.image,
     this.memo,
