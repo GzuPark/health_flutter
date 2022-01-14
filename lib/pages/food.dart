@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:health_flutter/data/data.dart';
+import 'package:health_flutter/data/database.dart';
 import 'package:health_flutter/style.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 
 import '../utils.dart';
 
@@ -18,31 +20,90 @@ class _FoodAddPageState extends State<FoodAddPage> {
   TextEditingController memoController = TextEditingController();
 
   @override
+  void initState() {
+    memoController.text = food.memo!;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        iconTheme: IconThemeData(color: txtColor),
+        elevation: 1.0,
+        actions: [
+          TextButton(
+            child: Text('저장', style: TextStyle(color: txtColor)),
+            onPressed: () async {
+              final db = DatabaseHelper.instance;
+              food.memo = memoController.text;
+              await db.insertFood(food);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
       body: Container(
         child: ListView.builder(
           itemCount: 4,
           itemBuilder: (ctx, idx) {
             if (idx == 0) {
               return Container(
+                margin: const EdgeInsets.symmetric(vertical: 16),
+                height: cardSize,
+                width: cardSize,
                 child: InkWell(
-                  child: Container(
-                    height: 150,
-                    child: Image.asset('assets/img/asian_food.jpg', fit: BoxFit.cover),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Align(
+                      child: food.image!.isEmpty
+                          ? Image.asset('assets/img/asian_food.jpg')
+                          : AssetThumb(
+                              width: cardSize.toInt(),
+                              height: cardSize.toInt(),
+                              asset: Asset(food.image, 'asian_food.png', 0, 0),
+                            ),
+                    ),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    selectImage();
+                  },
                 ),
               );
             } else if (idx == 1) {
+              String _t = food.time.toString();
+              String _h = _t.substring(0, _t.length - 2);
+              String _m = _t.substring(_t.length - 2);
+              TimeOfDay time = TimeOfDay(hour: int.parse(_h), minute: int.parse(_m));
+
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [Text('식사시간'), Text('오후 11:32')],
+                      children: [
+                        const Text('식사시간'),
+                        InkWell(
+                          child: Text(
+                            '${time.hour > 11 ? '오후' : '오전'} '
+                            '${Utils.makeTwoDigit(time.hour % 12)}:'
+                            '${Utils.makeTwoDigit(time.minute)}',
+                          ),
+                          onTap: () async {
+                            TimeOfDay? _time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+
+                            setState(() {
+                              food.time = int.parse('${_time?.hour}${Utils.makeTwoDigit(_time?.minute)}');
+                            });
+
+                            if (_time == null) {
+                              return;
+                            }
+                          },
+                        )
+                      ],
                     ),
                     Container(height: 12),
                     GridView.count(
@@ -81,7 +142,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
               );
             } else if (idx == 2) {
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Column(
                   children: [
                     Row(
@@ -125,7 +186,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
               );
             } else if (idx == 3) {
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -153,5 +214,17 @@ class _FoodAddPageState extends State<FoodAddPage> {
         ),
       ),
     );
+  }
+
+  Future<void> selectImage() async {
+    final _img = await MultiImagePicker.pickImages(maxImages: 1, enableCamera: true);
+
+    if (_img.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      food.image = _img.first.identifier;
+    });
   }
 }
