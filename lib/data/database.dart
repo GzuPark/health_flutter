@@ -42,7 +42,7 @@ class DatabaseHelper {
       meal INTEGER DEFAULT 0,
       kcal INTEGER DEFAULT 0,
       image String,
-      memo String,
+      memo String
     )
     ''');
 
@@ -55,7 +55,7 @@ class DatabaseHelper {
       intense INTEGER DEFAULT 0,
       part INTEGER DEFAULT 0,
       name String,
-      memo String,
+      memo String
     )
     ''');
 
@@ -64,7 +64,7 @@ class DatabaseHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       date INTEGER DEFAULT 0,
       image String, 
-      memo String,
+      memo String
     )
     ''');
 
@@ -73,7 +73,7 @@ class DatabaseHelper {
       date INTEGER DEFAULT 0,
       weight INTEGER DEFAULT 0,
       fat INTEGER DEFAULT 0,
-      muscle INTEGER DEFAULT 0,
+      muscle INTEGER DEFAULT 0
     )
     ''');
   }
@@ -83,10 +83,9 @@ class DatabaseHelper {
   // foodTable
   Future<int> insertFood(Food food) async {
     Database db = await instance.database;
-    final _idQuery = await db.query(foodTable, where: "id = ?", whereArgs: [food.id]);
     final _map = food.toMap();
 
-    if (_idQuery.isEmpty) {
+    if (_map != null) {
       return await db.insert(foodTable, _map);
     } else {
       return await db.update(foodTable, _map, where: 'id = ?', whereArgs: [food.id]);
@@ -118,10 +117,9 @@ class DatabaseHelper {
   // workoutTable
   Future<int> insertWorkout(Workout workout) async {
     Database db = await instance.database;
-    final _idQuery = await db.query(workoutTable, where: "id = ?", whereArgs: [workout.id]);
     final _map = workout.toMap();
 
-    if (_idQuery.isEmpty) {
+    if (_map != null) {
       return await db.insert(workoutTable, _map);
     } else {
       return await db.update(workoutTable, _map, where: 'id = ?', whereArgs: [workout.id]);
@@ -153,10 +151,9 @@ class DatabaseHelper {
   // bodyTable
   Future<int> insertEyeBody(EyeBody body) async {
     Database db = await instance.database;
-    final _idQuery = await db.query(bodyTable, where: "id = ?", whereArgs: [body.id]);
     final _map = body.toMap();
 
-    if (_idQuery.isEmpty) {
+    if (_map != null) {
       return await db.insert(bodyTable, _map);
     } else {
       return await db.update(bodyTable, _map, where: 'id = ?', whereArgs: [body.id]);
