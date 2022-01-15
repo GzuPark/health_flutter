@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_flutter/pages/eyebody.dart';
 import 'package:health_flutter/pages/food.dart';
 import 'package:health_flutter/pages/workout.dart';
 import 'package:health_flutter/style.dart';
@@ -89,7 +90,21 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         }),
                     TextButton(child: const Text('몸무게'), onPressed: () {}),
-                    TextButton(child: const Text('눈바디'), onPressed: () {}),
+                    TextButton(
+                        child: const Text('눈바디'),
+                        onPressed: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (ctx) => EyeBodyAddPage(
+                                eyebody: EyeBody(
+                                  date: Utils.getFormatTime(DateTime.now()),
+                                  image: '',
+                                  memo: '',
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
                   ],
                 ),
               );
