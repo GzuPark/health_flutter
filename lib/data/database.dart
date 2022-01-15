@@ -51,7 +51,9 @@ class DatabaseHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       date INTEGER DEFAULT 0,
       time INTEGER DEFAULT 0,
+      type INTEGER DEFAULT 0,
       kcal INTEGER DEFAULT 0,
+      distance INTEGER DEFAULT 0,
       intense INTEGER DEFAULT 0,
       part INTEGER DEFAULT 0,
       name String,
@@ -85,6 +87,7 @@ class DatabaseHelper {
     Database db = await instance.database;
     final _map = food.toMap();
 
+    // ignore: unnecessary_null_comparison
     if (_map != null) {
       return await db.insert(foodTable, _map);
     } else {
@@ -119,6 +122,7 @@ class DatabaseHelper {
     Database db = await instance.database;
     final _map = workout.toMap();
 
+    // ignore: unnecessary_null_comparison
     if (_map != null) {
       return await db.insert(workoutTable, _map);
     } else {
@@ -153,6 +157,7 @@ class DatabaseHelper {
     Database db = await instance.database;
     final _map = body.toMap();
 
+    // ignore: unnecessary_null_comparison
     if (_map != null) {
       return await db.insert(bodyTable, _map);
     } else {

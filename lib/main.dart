@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_flutter/pages/food.dart';
+import 'package:health_flutter/pages/workout.dart';
 import 'package:health_flutter/style.dart';
 import 'package:health_flutter/utils.dart';
 
@@ -66,7 +67,27 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       },
                     ),
-                    TextButton(child: const Text('운동'), onPressed: () {}),
+                    TextButton(
+                        child: const Text('운동'),
+                        onPressed: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (ctx) => WorkoutAddPage(
+                                workout: Workout(
+                                  date: Utils.getFormatTime(DateTime.now()),
+                                  time: 60,
+                                  type: 0,
+                                  kcal: 0,
+                                  distance: 0,
+                                  intense: 0,
+                                  part: 0,
+                                  name: '',
+                                  memo: '',
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
                     TextButton(child: const Text('몸무게'), onPressed: () {}),
                     TextButton(child: const Text('눈바디'), onPressed: () {}),
                   ],

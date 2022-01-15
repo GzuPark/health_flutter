@@ -50,7 +50,9 @@ class Workout {
   int? id;
   int date;
   int time;
+  int type;
   int kcal;
+  int distance;
   int intense; // 강도
   int part;
   String name;
@@ -60,7 +62,9 @@ class Workout {
     this.id,
     required this.date,
     required this.time,
+    required this.type,
     required this.kcal,
+    required this.distance,
     required this.intense,
     required this.part,
     required this.name,
@@ -72,7 +76,9 @@ class Workout {
       id: data['id'],
       date: data['date'],
       time: data['time'],
+      type: data['type'],
       kcal: data['kcal'],
+      distance: data['distance'],
       intense: data['intense'],
       part: data['part'],
       name: data['name'],
@@ -85,7 +91,9 @@ class Workout {
       'id': id,
       'date': date,
       'time': time,
+      'type': type,
       'kcal': kcal,
+      'distance': distance,
       'intense': intense,
       'part': part,
       'name': name,
