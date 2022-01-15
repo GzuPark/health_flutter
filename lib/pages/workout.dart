@@ -45,6 +45,10 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
             onPressed: () async {
               final db = DatabaseHelper.instance;
               workout.memo = memoController.text;
+              workout.time = timeController.text.isEmpty ? 0 : int.parse(timeController.text);
+              workout.kcal = kcalController.text.isEmpty ? 0 : int.parse(kcalController.text);
+              workout.distance = distController.text.isEmpty ? 0 : int.parse(distController.text);
+              workout.name = nameController.text;
               await db.insertWorkout(workout);
               Navigator.of(context).pop();
             },
@@ -57,7 +61,7 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
           itemBuilder: (ctx, idx) {
             if (idx == 0) {
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 width: 70,
                 height: 70,
                 child: Row(
@@ -103,6 +107,7 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
                         const Text('운동 시간'),
                         SizedBox(
                           width: 70,
+                          height: 40,
                           child: TextField(
                             controller: timeController,
                             keyboardType: TextInputType.number,
@@ -124,6 +129,7 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
                         const Text('Kcal'),
                         SizedBox(
                           width: 70,
+                          height: 40,
                           child: TextField(
                             controller: kcalController,
                             keyboardType: TextInputType.number,
@@ -145,6 +151,7 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
                         const Text('운동 거리'),
                         SizedBox(
                           width: 70,
+                          height: 40,
                           child: TextField(
                             controller: distController,
                             keyboardType: TextInputType.number,
@@ -259,8 +266,8 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
                     const Text('메모'),
                     Container(height: 12),
                     TextField(
-                      maxLines: 10,
-                      minLines: 10,
+                      maxLines: 6,
+                      minLines: 6,
                       keyboardType: TextInputType.multiline,
                       controller: memoController,
                       decoration: InputDecoration(
