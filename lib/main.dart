@@ -315,6 +315,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 calendarFormat: _calendarFormat,
                 availableCalendarFormats: const {CalendarFormat.twoWeeks: ''},
                 headerStyle: const HeaderStyle(titleCentered: true),
+                calendarStyle: CalendarStyle(
+                  selectedDecoration: BoxDecoration(color: mainColor, shape: BoxShape.circle),
+                  todayDecoration: BoxDecoration(color: subColor, shape: BoxShape.circle),
+                ),
                 onFormatChanged: (format) {
                   if (_calendarFormat != format) {
                     setState(() {
@@ -371,6 +375,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 calendarFormat: _calendarFormat,
                 availableCalendarFormats: const {CalendarFormat.twoWeeks: ''},
                 headerStyle: const HeaderStyle(titleCentered: true),
+                calendarStyle: CalendarStyle(
+                  selectedDecoration: BoxDecoration(color: mainColor, shape: BoxShape.circle),
+                  todayDecoration: BoxDecoration(color: subColor, shape: BoxShape.circle),
+                ),
                 onFormatChanged: (format) {
                   if (_calendarFormat != format) {
                     setState(() {
