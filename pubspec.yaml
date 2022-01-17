@@ -39,6 +39,7 @@ dependencies:
   multi_image_picker2: ^5.0.2
   table_calendar: ^3.0.3
   fl_chart: ^0.41.0
+  flutter_local_notifications: ^9.2.0
 
 dev_dependencies:
   flutter_test:
