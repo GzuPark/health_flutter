@@ -10,13 +10,16 @@ import 'package:health_flutter/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'data/data.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() async {
-  runApp(const MyApp());
+  // changeToDarkMode();
+
+  initializeDateFormatting().then((_) => runApp(const MyApp()));
 
   tz.initializeTimeZones();
   const AndroidNotificationChannel androidNotificationChannel = AndroidNotificationChannel('tutorial', 'healthApp');
@@ -31,7 +34,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: MyHomePage());
+    return MaterialApp(
+      home: const MyHomePage(),
+      theme: ThemeData(
+        primarySwatch: mainGroupColor,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+    );
   }
 }
 
@@ -138,19 +147,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(elevation: 0),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(elevation: 0),
+      ),
+      backgroundColor: bgColor,
       body: getPage(),
       floatingActionButton: ![0, 1].contains(currentIndex)
           ? Container()
           : FloatingActionButton(
-              child: const Icon(Icons.add),
+              child: const Icon(Icons.add, color: Colors.white),
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
                   backgroundColor: bgColor,
                   builder: (ctx) {
                     return SizedBox(
-                      height: 250,
+                      height: 180,
                       child: Column(
                         children: [
                           TextButton(
@@ -198,7 +211,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
                                 getHistories();
                               }),
-                          TextButton(child: const Text('몸무게'), onPressed: () {}),
                           TextButton(
                             child: const Text('눈바디'),
                             onPressed: () async {
@@ -226,6 +238,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
+        backgroundColor: bgColor,
+        unselectedItemColor: txtColor,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '오늘'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: '기록'),
@@ -330,7 +344,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('${w.weight} kg', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                            Text('${w.weight} kg',
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: txtColor,
+                                )),
                           ],
                         ),
                       ),
@@ -372,6 +391,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: TableCalendar(
                 // https://dipeshgoswami.medium.com/table-calendar-3-0-0-null-safety-818ba8d4c45e
                 // reference: Flutter table_calendar >= 3.0.0
+                locale: 'ko-KR',
                 firstDay: DateTime(2021, 1, 1),
                 lastDay: DateTime(2030, 12, 31),
                 focusedDay: _focusedDay,
@@ -432,6 +452,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: TableCalendar(
                 // https://dipeshgoswami.medium.com/table-calendar-3-0-0-null-safety-818ba8d4c45e
                 // reference: Flutter table_calendar >= 3.0.0
+                locale: 'ko-KR',
                 firstDay: DateTime(2021, 1, 1),
                 lastDay: DateTime(2030, 12, 31),
                 focusedDay: _focusedDay,
@@ -476,7 +497,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       Text(
                         '${dateTime.month}월 ${dateTime.day}일',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18, color: txtColor, fontWeight: FontWeight.bold),
                       ),
                       InkWell(
                         child: Container(
@@ -485,7 +506,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             borderRadius: BorderRadius.circular(8),
                             color: mainColor,
                           ),
-                          child: const Text('저장'),
+                          child: Text('저장', style: mTextStyle.apply(color: txtColor)),
                         ),
                         onTap: () async {
                           Weight w;
@@ -515,11 +536,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text('몸무게'),
+                            Text('몸무게', style: mTextStyle.apply(color: txtColor)),
                             TextField(
                               controller: weightController,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
+                              style: mTextStyle.apply(color: txtColor),
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(
                                   borderSide: BorderSide(color: txtColor, width: 0.5),
@@ -536,11 +558,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text('근육량'),
+                            Text('근육량', style: mTextStyle.apply(color: txtColor)),
                             TextField(
                               controller: muscleController,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
+                              style: mTextStyle.apply(color: txtColor),
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(
                                   borderSide: BorderSide(color: txtColor, width: 0.5),
@@ -557,11 +580,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text('지방'),
+                            Text('지방', style: mTextStyle.apply(color: txtColor)),
                             TextField(
                               controller: fatController,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
+                              style: mTextStyle.apply(color: txtColor),
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(
                                   borderSide: BorderSide(color: txtColor, width: 0.5),

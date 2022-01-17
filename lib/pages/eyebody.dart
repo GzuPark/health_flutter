@@ -42,6 +42,7 @@ class _EyeBodyAddPageState extends State<EyeBodyAddPage> {
           ),
         ],
       ),
+      backgroundColor: bgColor,
       body: Container(
         child: ListView.builder(
           itemCount: 3,
@@ -75,13 +76,14 @@ class _EyeBodyAddPageState extends State<EyeBodyAddPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('메모'),
+                    Text('메모', style: mTextStyle.apply(color: txtColor)),
                     Container(height: 12),
                     TextField(
                       maxLines: 10,
                       minLines: 10,
                       keyboardType: TextInputType.multiline,
                       controller: memoController,
+                      style: mTextStyle.apply(color: txtColor),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),

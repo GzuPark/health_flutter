@@ -44,6 +44,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
           ),
         ],
       ),
+      backgroundColor: bgColor,
       body: Container(
         child: ListView.builder(
           itemCount: 4,
@@ -84,12 +85,13 @@ class _FoodAddPageState extends State<FoodAddPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('식사시간'),
+                        Text('식사시간', style: mTextStyle.apply(color: txtColor)),
                         InkWell(
                           child: Text(
                             '${time.hour > 11 ? '오후' : '오전'} '
                             '${Utils.makeTwoDigit(time.hour % 12)}:'
                             '${Utils.makeTwoDigit(time.minute)}',
+                            style: mTextStyle.apply(color: txtColor),
                           ),
                           onTap: () async {
                             TimeOfDay? _time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
@@ -147,7 +149,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [Text('식단 평가')],
+                      children: [Text('식단 평가', style: mTextStyle.apply(color: txtColor))],
                     ),
                     Container(height: 12),
                     GridView.count(
@@ -190,13 +192,14 @@ class _FoodAddPageState extends State<FoodAddPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('메모'),
+                    Text('메모', style: mTextStyle.apply(color: txtColor)),
                     Container(height: 12),
                     TextField(
                       maxLines: 10,
                       minLines: 10,
                       keyboardType: TextInputType.multiline,
                       controller: memoController,
+                      style: mTextStyle.apply(color: txtColor),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
