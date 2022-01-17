@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:health_flutter/data/database.dart';
 import 'package:health_flutter/pages/eyebody.dart';
 import 'package:health_flutter/pages/food.dart';
@@ -7,11 +8,22 @@ import 'package:health_flutter/pages/workout.dart';
 import 'package:health_flutter/style.dart';
 import 'package:health_flutter/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'data/data.dart';
 
-void main() {
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+void main() async {
   runApp(const MyApp());
+
+  tz.initializeTimeZones();
+  const AndroidNotificationChannel androidNotificationChannel = AndroidNotificationChannel('tutorial', 'healthApp');
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(androidNotificationChannel);
 }
 
 class MyApp extends StatelessWidget {
@@ -49,6 +61,22 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
 
+  // notification
+  Future<bool> initNotification() async {
+    if (flutterLocalNotificationsPlugin == null) {
+      flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    }
+
+    var initAndroidSetting = AndroidInitializationSettings('app_icon');
+    var initIOSSetting = IOSInitializationSettings();
+    var initSetting = InitializationSettings(android: initAndroidSetting, iOS: initIOSSetting);
+
+    await flutterLocalNotificationsPlugin.initialize(initSetting, onSelectNotification: (payLoad) async {});
+
+    setScheduling();
+    return true;
+  }
+
   void getHistories() async {
     int _d = Utils.getFormatTime(dateTime);
 
@@ -80,6 +108,31 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     getHistories();
+    initNotification();
+  }
+
+  void setScheduling() {
+    var android = const AndroidNotificationDetails(
+      'tutorial',
+      'healthApp',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+    var ios = const IOSNotificationDetails();
+
+    NotificationDetails detail = NotificationDetails(android: android, iOS: ios);
+
+    flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      '오늘의 건강을 기록해주세요',
+      '식사, 운동, 몸무게를 기록해주세요 🤩',
+      tz.TZDateTime.from(DateTime.now().add(Duration(seconds: 10)), tz.local),
+      detail,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      androidAllowWhileIdle: true,
+      payload: 'healthApp',
+      matchDateTimeComponents: DateTimeComponents.time, // everyday
+    );
   }
 
   @override
