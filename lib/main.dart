@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:health_flutter/data/database.dart';
 import 'package:health_flutter/pages/eyebody.dart';
@@ -39,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Workout> workouts = [];
   List<EyeBody> eyeBodies = [];
   List<Weight> weight = [];
+  List<Weight> weights = [];
 
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
@@ -50,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
     workouts = await dbHelper.queryWorkoutByDate(_d);
     eyeBodies = await dbHelper.queryEyeBodyByDate(_d);
     weight = await dbHelper.queryWeightByDate(_d);
+    weights = await dbHelper.queryAllWeight();
 
     if (weight.isNotEmpty) {
       final w = weight.first;
@@ -76,88 +79,90 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(),
       body: getPage(),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            backgroundColor: bgColor,
-            builder: (ctx) {
-              return SizedBox(
-                height: 250,
-                child: Column(
-                  children: [
-                    TextButton(
-                      child: const Text('식단'),
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) => FoodAddPage(
-                              food: Food(
-                                date: Utils.getFormatTime(dateTime),
-                                time: 1130,
-                                type: 0,
-                                meal: 0,
-                                kcal: 0,
-                                image: '',
-                                memo: '',
-                              ),
-                            ),
-                          ),
-                        );
-
-                        getHistories();
-                      },
-                    ),
-                    TextButton(
-                        child: const Text('운동'),
-                        onPressed: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (ctx) => WorkoutAddPage(
-                                workout: Workout(
-                                  date: Utils.getFormatTime(dateTime),
-                                  time: 60,
-                                  type: 0,
-                                  kcal: 0,
-                                  distance: 0,
-                                  intense: 0,
-                                  part: 0,
-                                  name: '',
-                                  memo: '',
+      floatingActionButton: ![0, 1].contains(currentIndex)
+          ? Container()
+          : FloatingActionButton(
+              child: const Icon(Icons.add),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: bgColor,
+                  builder: (ctx) {
+                    return SizedBox(
+                      height: 250,
+                      child: Column(
+                        children: [
+                          TextButton(
+                            child: const Text('식단'),
+                            onPressed: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => FoodAddPage(
+                                    food: Food(
+                                      date: Utils.getFormatTime(dateTime),
+                                      time: 1130,
+                                      type: 0,
+                                      meal: 0,
+                                      kcal: 0,
+                                      image: '',
+                                      memo: '',
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          );
+                              );
 
-                          getHistories();
-                        }),
-                    TextButton(child: const Text('몸무게'), onPressed: () {}),
-                    TextButton(
-                      child: const Text('눈바디'),
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) => EyeBodyAddPage(
-                              eyebody: EyeBody(
-                                date: Utils.getFormatTime(dateTime),
-                                image: '',
-                                memo: '',
-                              ),
-                            ),
+                              getHistories();
+                            },
                           ),
-                        );
+                          TextButton(
+                              child: const Text('운동'),
+                              onPressed: () async {
+                                await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (ctx) => WorkoutAddPage(
+                                      workout: Workout(
+                                        date: Utils.getFormatTime(dateTime),
+                                        time: 60,
+                                        type: 0,
+                                        kcal: 0,
+                                        distance: 0,
+                                        intense: 0,
+                                        part: 0,
+                                        name: '',
+                                        memo: '',
+                                      ),
+                                    ),
+                                  ),
+                                );
 
-                        getHistories();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
+                                getHistories();
+                              }),
+                          TextButton(child: const Text('몸무게'), onPressed: () {}),
+                          TextButton(
+                            child: const Text('눈바디'),
+                            onPressed: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => EyeBodyAddPage(
+                                    eyebody: EyeBody(
+                                      date: Utils.getFormatTime(dateTime),
+                                      image: '',
+                                      memo: '',
+                                    ),
+                                  ),
+                                ),
+                              );
+
+                              getHistories();
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -244,7 +249,30 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: 2,
               itemBuilder: (BuildContext ctx, int idx) {
                 if (idx == 0) {
-                  return Container();
+                  if (weight.isEmpty) {
+                    return Container();
+                  } else {
+                    final w = weight.first;
+
+                    return Container(
+                      height: cardSize,
+                      width: cardSize,
+                      child: Container(
+                        margin: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: const [BoxShadow(spreadRadius: 4, blurRadius: 4, color: Colors.black12)]),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('${w.weight} kg', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                 } else {
                   if (eyeBodies.isEmpty) {
                     return Container(
@@ -323,11 +351,12 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController weightController = TextEditingController();
   TextEditingController fatController = TextEditingController();
   TextEditingController muscleController = TextEditingController();
+  int chartIndex = 0;
 
   Widget getWeightWidget() {
     return Container(
       child: ListView.builder(
-        itemCount: 2,
+        itemCount: 3,
         itemBuilder: (ctx, idx) {
           if (idx == 0) {
             CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
@@ -400,7 +429,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           w.muscle = int.tryParse(muscleController.text) ?? 0;
 
                           await dbHelper.insertWeight(w);
-                          // getHistories();
+                          getHistories();
+                          FocusScope.of(context).unfocus();
                         },
                       ),
                     ],
@@ -472,6 +502,133 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ],
+                  ),
+                ],
+              ),
+            );
+          } else if (idx == 2) {
+            List<FlSpot> spots = [];
+
+            for (final w in weights) {
+              if (chartIndex == 0) {
+                spots.add(FlSpot(w.date.toDouble(), w.weight!.toDouble()));
+              } else if (chartIndex == 1) {
+                spots.add(FlSpot(w.date.toDouble(), w.muscle!.toDouble()));
+              } else {
+                spots.add(FlSpot(w.date.toDouble(), w.fat!.toDouble()));
+              }
+            }
+
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      // weight
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: chartIndex == 0 ? mainColor : inactiveBgColor,
+                          ),
+                          child: Text(
+                            '몸무게',
+                            style: TextStyle(color: chartIndex == 0 ? Colors.white : inactiveTxtColor),
+                          ),
+                        ),
+                        onTap: () async {
+                          setState(() {
+                            chartIndex = 0;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      // muscle
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: chartIndex == 1 ? mainColor : inactiveBgColor,
+                          ),
+                          child: Text(
+                            '근육량',
+                            style: TextStyle(color: chartIndex == 1 ? Colors.white : inactiveTxtColor),
+                          ),
+                        ),
+                        onTap: () async {
+                          setState(() {
+                            chartIndex = 1;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      // fat
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: chartIndex == 2 ? mainColor : inactiveBgColor,
+                          ),
+                          child: Text(
+                            '지방',
+                            style: TextStyle(color: chartIndex == 2 ? Colors.white : inactiveTxtColor),
+                          ),
+                        ),
+                        onTap: () async {
+                          setState(() {
+                            chartIndex = 2;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  // chart
+                  Container(
+                    height: 250,
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [BoxShadow(blurRadius: 6, spreadRadius: 2, color: Colors.black12)],
+                    ),
+                    child: LineChart(
+                      LineChartData(
+                        titlesData: FlTitlesData(
+                          leftTitles: SideTitles(showTitles: false),
+                          rightTitles: SideTitles(showTitles: false),
+                          topTitles: SideTitles(showTitles: false),
+                          bottomTitles: SideTitles(
+                            interval: 1,
+                            showTitles: true,
+                            getTitles: (value) {
+                              DateTime date = Utils.stringToDateTime(value.toInt().toString());
+                              return '${date.day}일';
+                            },
+                          ),
+                        ),
+                        gridData: FlGridData(show: false),
+                        borderData: FlBorderData(show: false),
+                        lineTouchData: LineTouchData(
+                          touchTooltipData: LineTouchTooltipData(
+                            showOnTopOfTheChartBoxArea: false,
+                            getTooltipItems: (spots) {
+                              return [LineTooltipItem('${spots.first.y}kg', TextStyle(color: mainColor))];
+                            },
+                          ),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            colors: [mainColor],
+                            spots: spots,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
