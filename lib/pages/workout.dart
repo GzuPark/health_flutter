@@ -289,3 +289,54 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
     );
   }
 }
+
+class MainWorkoutCard extends StatelessWidget {
+  final Workout workout;
+
+  const MainWorkoutCard({Key? key, required this.workout}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Container(
+          margin: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: bgColor,
+            boxShadow: const [BoxShadow(blurRadius: 4, spreadRadius: 4, color: Colors.black12)],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(color: inactiveBgColor, borderRadius: BorderRadius.circular(15)),
+                    child: Image.asset('assets/img/${workout.type}.png'),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '${Utils.makeTwoDigit(workout.time ~/ 60)}:${Utils.makeTwoDigit(workout.time % 60)}',
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Text(workout.name),
+              ),
+              Text(workout.kcal == 0 ? '' : '${workout.kcal} kcal'),
+              Text(workout.distance == 0 ? '' : '${workout.distance} km'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

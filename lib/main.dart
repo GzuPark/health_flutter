@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_flutter/data/database.dart';
 import 'package:health_flutter/pages/eyebody.dart';
 import 'package:health_flutter/pages/food.dart';
 import 'package:health_flutter/pages/workout.dart';
@@ -16,9 +17,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MyHomePage(),
-    );
+    return const MaterialApp(home: MyHomePage());
   }
 }
 
@@ -30,7 +29,32 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final dbHelper = DatabaseHelper.instance;
+
   int currentIndex = 0;
+  DateTime dateTime = DateTime.now();
+
+  List<Food> foods = [];
+  List<Workout> workouts = [];
+  List<EyeBody> eyeBodies = [];
+  List<Weight> weight = [];
+
+  void getHistories() async {
+    int _d = Utils.getFormatTime(dateTime);
+
+    foods = await dbHelper.queryFoodByDate(_d);
+    workouts = await dbHelper.queryWorkoutByDate(_d);
+    eyeBodies = await dbHelper.queryEyeBodyByDate(_d);
+    weight = await dbHelper.queryWeightByDate(_d);
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getHistories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +90,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                         );
+
+                        getHistories();
                       },
                     ),
                     TextButton(
@@ -88,23 +114,28 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           );
+
+                          getHistories();
                         }),
                     TextButton(child: const Text('몸무게'), onPressed: () {}),
                     TextButton(
-                        child: const Text('눈바디'),
-                        onPressed: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (ctx) => EyeBodyAddPage(
-                                eyebody: EyeBody(
-                                  date: Utils.getFormatTime(DateTime.now()),
-                                  image: '',
-                                  memo: '',
-                                ),
+                      child: const Text('눈바디'),
+                      onPressed: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => EyeBodyAddPage(
+                              eyebody: EyeBody(
+                                date: Utils.getFormatTime(DateTime.now()),
+                                image: '',
+                                memo: '',
                               ),
                             ),
-                          );
-                        }),
+                          ),
+                        );
+
+                        getHistories();
+                      },
+                    ),
                   ],
                 ),
               );
@@ -143,35 +174,35 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         children: [
           Container(
-            height: cardSize + 20,
+            height: cardSize,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 3,
+              itemCount: foods.length,
               itemBuilder: (BuildContext ctx, int idx) {
                 return Container(
                   height: cardSize,
                   width: cardSize,
-                  color: mainColor,
+                  child: MainFoodCard(food: foods[idx]),
                 );
               },
             ),
           ),
           Container(
-            height: cardSize + 20,
+            height: cardSize,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 3,
+              itemCount: workouts.length,
               itemBuilder: (BuildContext ctx, int idx) {
                 return Container(
                   height: cardSize,
                   width: cardSize,
-                  color: mainColor,
+                  child: MainWorkoutCard(workout: workouts[idx]),
                 );
               },
             ),
           ),
           Container(
-            height: cardSize + 20,
+            height: cardSize,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: 2,
@@ -179,7 +210,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (idx == 0) {
                   return Container();
                 } else {
-                  return Container();
+                  if (eyeBodies.isEmpty) {
+                    return Container(
+                      height: cardSize,
+                      width: cardSize,
+                      color: mainColor,
+                    );
+                  }
+                  return Container(
+                    height: cardSize,
+                    width: cardSize,
+                    child: MainEyeBodyCard(eyeBody: eyeBodies[0]),
+                  );
                 }
               },
             ),

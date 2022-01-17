@@ -62,7 +62,7 @@ class _FoodAddPageState extends State<FoodAddPage> {
                           : AssetThumb(
                               width: cardSize.toInt(),
                               height: cardSize.toInt(),
-                              asset: Asset(food.image, 'asian_food.png', 0, 0),
+                              asset: Asset(food.image, 'food.png', 0, 0),
                             ),
                     ),
                   ),
@@ -226,5 +226,65 @@ class _FoodAddPageState extends State<FoodAddPage> {
     setState(() {
       food.image = _img.first.identifier;
     });
+  }
+}
+
+class MainFoodCard extends StatelessWidget {
+  final Food food;
+
+  const MainFoodCard({Key? key, required this.food}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    String _t = food.time.toString();
+    String _h = _t.substring(0, _t.length - 2);
+    String _m = _t.substring(_t.length - 2);
+    TimeOfDay time = TimeOfDay(hour: int.parse(_h), minute: int.parse(_m));
+
+    return Container(
+      margin: const EdgeInsets.all(8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: AssetThumb(
+                  width: cardSize.toInt(),
+                  height: cardSize.toInt(),
+                  asset: Asset(food.image, 'food.png', 0, 0),
+                ),
+              ),
+              Positioned.fill(child: Container(color: Colors.black38)),
+              Positioned.fill(
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${time.hour > 11 ? '오후' : '오전'} '
+                    '${Utils.makeTwoDigit(time.hour % 12)}:'
+                    '${Utils.makeTwoDigit(time.minute)}',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 6,
+                bottom: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(color: mainColor, borderRadius: BorderRadius.circular(8)),
+                  child: Text(
+                    mealTime[food.meal],
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

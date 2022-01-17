@@ -113,3 +113,34 @@ class _EyeBodyAddPageState extends State<EyeBodyAddPage> {
     });
   }
 }
+
+class MainEyeBodyCard extends StatelessWidget {
+  final EyeBody eyeBody;
+
+  const MainEyeBodyCard({Key? key, required this.eyeBody}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: AssetThumb(
+                  width: cardSize.toInt(),
+                  height: cardSize.toInt(),
+                  asset: Asset(eyeBody.image, 'food.png', 0, 0),
+                ),
+              ),
+              Positioned.fill(child: Container(color: Colors.black12)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
