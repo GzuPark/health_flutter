@@ -45,176 +45,174 @@ class _FoodAddPageState extends State<FoodAddPage> {
         ],
       ),
       backgroundColor: bgColor,
-      body: Container(
-        child: ListView.builder(
-          itemCount: 4,
-          itemBuilder: (ctx, idx) {
-            if (idx == 0) {
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                height: cardSize,
-                width: cardSize,
-                child: InkWell(
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Align(
-                      child: food.image!.isEmpty
-                          ? Image.asset('assets/img/asian_food.jpg')
-                          : AssetThumb(
-                              width: cardSize.toInt(),
-                              height: cardSize.toInt(),
-                              asset: Asset(food.image, 'food.png', 0, 0),
+      body: ListView.builder(
+        itemCount: 4,
+        itemBuilder: (ctx, idx) {
+          if (idx == 0) {
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 16),
+              height: cardSize,
+              width: cardSize,
+              child: InkWell(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Align(
+                    child: food.image!.isEmpty
+                        ? Image.asset('assets/img/asian_food.jpg')
+                        : AssetThumb(
+                            width: cardSize.toInt(),
+                            height: cardSize.toInt(),
+                            asset: Asset(food.image, 'food.png', 0, 0),
+                          ),
+                  ),
+                ),
+                onTap: () {
+                  selectImage();
+                },
+              ),
+            );
+          } else if (idx == 1) {
+            String _t = food.time.toString();
+            String _h = _t.substring(0, _t.length - 2);
+            String _m = _t.substring(_t.length - 2);
+            TimeOfDay time = TimeOfDay(hour: int.parse(_h), minute: int.parse(_m));
+
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('식사시간', style: mTextStyle.apply(color: txtColor)),
+                      InkWell(
+                        child: Text(
+                          '${time.hour > 11 ? '오후' : '오전'} '
+                          '${Utils.makeTwoDigit(time.hour % 12)}:'
+                          '${Utils.makeTwoDigit(time.minute)}',
+                          style: mTextStyle.apply(color: txtColor),
+                        ),
+                        onTap: () async {
+                          TimeOfDay? _time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+
+                          setState(() {
+                            food.time = int.parse('${_time?.hour}${Utils.makeTwoDigit(_time?.minute)}');
+                          });
+
+                          if (_time == null) {
+                            return;
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                  Container(height: 12),
+                  GridView.count(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    crossAxisCount: 4, // grid row 에 최대로 보여줄 수 있는 개수, 지정 숫자를 넘어갈 경우 추가 row 에 표시
+                    childAspectRatio: 2.5,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                    children: List.generate(
+                      mealTime.length,
+                      (_idx) {
+                        return InkWell(
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: food.meal == _idx ? mainColor : inactiveBgColor,
                             ),
+                            child: Text(
+                              mealTime[_idx],
+                              style: TextStyle(color: food.meal == _idx ? Colors.white : inactiveTxtColor),
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              food.meal = _idx;
+                            });
+                          },
+                        );
+                      },
                     ),
                   ),
-                  onTap: () {
-                    selectImage();
-                  },
-                ),
-              );
-            } else if (idx == 1) {
-              String _t = food.time.toString();
-              String _h = _t.substring(0, _t.length - 2);
-              String _m = _t.substring(_t.length - 2);
-              TimeOfDay time = TimeOfDay(hour: int.parse(_h), minute: int.parse(_m));
-
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('식사시간', style: mTextStyle.apply(color: txtColor)),
-                        InkWell(
-                          child: Text(
-                            '${time.hour > 11 ? '오후' : '오전'} '
-                            '${Utils.makeTwoDigit(time.hour % 12)}:'
-                            '${Utils.makeTwoDigit(time.minute)}',
-                            style: mTextStyle.apply(color: txtColor),
+                ],
+              ),
+            );
+          } else if (idx == 2) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [Text('식단 평가', style: mTextStyle.apply(color: txtColor))],
+                  ),
+                  Container(height: 12),
+                  GridView.count(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    crossAxisCount: 4, // grid row 에 최대로 보여줄 수 있는 개수, 지정 숫자를 넘어갈 경우 추가 row 에 표시
+                    childAspectRatio: 2.5,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                    children: List.generate(
+                      mealType.length,
+                      (_idx) {
+                        return InkWell(
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: food.type == _idx ? mainColor : inactiveBgColor,
+                            ),
+                            child: Text(
+                              mealType[_idx],
+                              style: TextStyle(color: food.type == _idx ? Colors.white : inactiveTxtColor),
+                            ),
                           ),
-                          onTap: () async {
-                            TimeOfDay? _time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-
+                          onTap: () {
                             setState(() {
-                              food.time = int.parse('${_time?.hour}${Utils.makeTwoDigit(_time?.minute)}');
+                              food.type = _idx;
                             });
-
-                            if (_time == null) {
-                              return;
-                            }
                           },
-                        )
-                      ],
+                        );
+                      },
                     ),
-                    Container(height: 12),
-                    GridView.count(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      crossAxisCount: 4, // grid row 에 최대로 보여줄 수 있는 개수, 지정 숫자를 넘어갈 경우 추가 row 에 표시
-                      childAspectRatio: 2.5,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                      children: List.generate(
-                        mealTime.length,
-                        (_idx) {
-                          return InkWell(
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: food.meal == _idx ? mainColor : inactiveBgColor,
-                              ),
-                              child: Text(
-                                mealTime[_idx],
-                                style: TextStyle(color: food.meal == _idx ? Colors.white : inactiveTxtColor),
-                              ),
-                            ),
-                            onTap: () {
-                              setState(() {
-                                food.meal = _idx;
-                              });
-                            },
-                          );
-                        },
+                  ),
+                ],
+              ),
+            );
+          } else if (idx == 3) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('메모', style: mTextStyle.apply(color: txtColor)),
+                  Container(height: 12),
+                  TextField(
+                    maxLines: 10,
+                    minLines: 10,
+                    keyboardType: TextInputType.multiline,
+                    controller: memoController,
+                    style: mTextStyle.apply(color: txtColor),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(width: 0.5, color: txtColor),
                       ),
                     ),
-                  ],
-                ),
-              );
-            } else if (idx == 2) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('식단 평가', style: mTextStyle.apply(color: txtColor))],
-                    ),
-                    Container(height: 12),
-                    GridView.count(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      crossAxisCount: 4, // grid row 에 최대로 보여줄 수 있는 개수, 지정 숫자를 넘어갈 경우 추가 row 에 표시
-                      childAspectRatio: 2.5,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                      children: List.generate(
-                        mealType.length,
-                        (_idx) {
-                          return InkWell(
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: food.type == _idx ? mainColor : inactiveBgColor,
-                              ),
-                              child: Text(
-                                mealType[_idx],
-                                style: TextStyle(color: food.type == _idx ? Colors.white : inactiveTxtColor),
-                              ),
-                            ),
-                            onTap: () {
-                              setState(() {
-                                food.type = _idx;
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            } else if (idx == 3) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('메모', style: mTextStyle.apply(color: txtColor)),
-                    Container(height: 12),
-                    TextField(
-                      maxLines: 10,
-                      minLines: 10,
-                      keyboardType: TextInputType.multiline,
-                      controller: memoController,
-                      style: mTextStyle.apply(color: txtColor),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(width: 0.5, color: txtColor),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Container();
+          }
+        },
       ),
     );
   }

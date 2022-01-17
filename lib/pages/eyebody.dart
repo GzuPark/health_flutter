@@ -43,62 +43,60 @@ class _EyeBodyAddPageState extends State<EyeBodyAddPage> {
         ],
       ),
       backgroundColor: bgColor,
-      body: Container(
-        child: ListView.builder(
-          itemCount: 3,
-          itemBuilder: (ctx, idx) {
-            if (idx == 0) {
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                height: cardSize,
-                width: cardSize,
-                child: InkWell(
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Align(
-                      child: eyebody.image!.isEmpty
-                          ? Image.asset('assets/img/body.jpg')
-                          : AssetThumb(
-                              width: cardSize.toInt(),
-                              height: cardSize.toInt(),
-                              asset: Asset(eyebody.image, 'body.png', 0, 0),
-                            ),
-                    ),
+      body: ListView.builder(
+        itemCount: 3,
+        itemBuilder: (ctx, idx) {
+          if (idx == 0) {
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 16),
+              height: cardSize,
+              width: cardSize,
+              child: InkWell(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Align(
+                    child: eyebody.image!.isEmpty
+                        ? Image.asset('assets/img/body.jpg')
+                        : AssetThumb(
+                            width: cardSize.toInt(),
+                            height: cardSize.toInt(),
+                            asset: Asset(eyebody.image, 'body.png', 0, 0),
+                          ),
                   ),
-                  onTap: () {
-                    selectImage();
-                  },
                 ),
-              );
-            } else if (idx == 1) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('메모', style: mTextStyle.apply(color: txtColor)),
-                    Container(height: 12),
-                    TextField(
-                      maxLines: 10,
-                      minLines: 10,
-                      keyboardType: TextInputType.multiline,
-                      controller: memoController,
-                      style: mTextStyle.apply(color: txtColor),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(width: 0.5, color: txtColor),
-                        ),
+                onTap: () {
+                  selectImage();
+                },
+              ),
+            );
+          } else if (idx == 1) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('메모', style: mTextStyle.apply(color: txtColor)),
+                  Container(height: 12),
+                  TextField(
+                    maxLines: 10,
+                    minLines: 10,
+                    keyboardType: TextInputType.multiline,
+                    controller: memoController,
+                    style: mTextStyle.apply(color: txtColor),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(width: 0.5, color: txtColor),
                       ),
                     ),
-                  ],
-                ),
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Container();
+          }
+        },
       ),
     );
   }
