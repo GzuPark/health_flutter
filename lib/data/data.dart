@@ -136,13 +136,13 @@ class EyeBody {
 
 class Weight {
   int date;
-  int weight;
+  int? weight;
   int? fat;
   int? muscle;
 
   Weight({
     required this.date,
-    required this.weight,
+    this.weight,
     this.fat,
     this.muscle,
   });

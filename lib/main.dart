@@ -42,7 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
-  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
 
   void getHistories() async {
     int _d = Utils.getFormatTime(dateTime);
@@ -51,6 +50,17 @@ class _MyHomePageState extends State<MyHomePage> {
     workouts = await dbHelper.queryWorkoutByDate(_d);
     eyeBodies = await dbHelper.queryEyeBodyByDate(_d);
     weight = await dbHelper.queryWeightByDate(_d);
+
+    if (weight.isNotEmpty) {
+      final w = weight.first;
+      weightController.text = w.weight.toString();
+      fatController.text = w.fat.toString();
+      muscleController.text = w.muscle.toString();
+    } else {
+      weightController.text = '';
+      fatController.text = '';
+      muscleController.text = '';
+    }
 
     setState(() {});
   }
@@ -171,6 +181,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return getHomeWidget();
     } else if (currentIndex == 1) {
       return getHistoryWidget();
+    } else if (currentIndex == 2) {
+      return getWeightWidget();
     }
 
     return Container();
@@ -263,6 +275,8 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: 2,
         itemBuilder: (ctx, idx) {
           if (idx == 0) {
+            CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
+
             return Container(
               child: TableCalendar(
                 // https://dipeshgoswami.medium.com/table-calendar-3-0-0-null-safety-818ba8d4c45e
@@ -298,6 +312,170 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           } else if (idx == 1) {
             return getHomeWidget();
+          } else {
+            return Container();
+          }
+        },
+      ),
+    );
+  }
+
+  TextEditingController weightController = TextEditingController();
+  TextEditingController fatController = TextEditingController();
+  TextEditingController muscleController = TextEditingController();
+
+  Widget getWeightWidget() {
+    return Container(
+      child: ListView.builder(
+        itemCount: 2,
+        itemBuilder: (ctx, idx) {
+          if (idx == 0) {
+            CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
+
+            return Container(
+              child: TableCalendar(
+                // https://dipeshgoswami.medium.com/table-calendar-3-0-0-null-safety-818ba8d4c45e
+                // reference: Flutter table_calendar >= 3.0.0
+                firstDay: DateTime(2021, 1, 1),
+                lastDay: DateTime(2030, 12, 31),
+                focusedDay: _focusedDay,
+                calendarFormat: _calendarFormat,
+                availableCalendarFormats: const {CalendarFormat.twoWeeks: ''},
+                headerStyle: const HeaderStyle(titleCentered: true),
+                onFormatChanged: (format) {
+                  if (_calendarFormat != format) {
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                  }
+                },
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (!isSameDay(_selectedDay, selectedDay)) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  }
+
+                  dateTime = selectedDay;
+                  getHistories();
+                },
+              ),
+            );
+          } else if (idx == 1) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                children: [
+                  // date & save button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${dateTime.month}월 ${dateTime.day}일',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: mainColor,
+                          ),
+                          child: const Text('저장'),
+                        ),
+                        onTap: () async {
+                          Weight w;
+                          if (weight.isEmpty) {
+                            w = Weight(date: Utils.getFormatTime(dateTime));
+                          } else {
+                            w = weight.first;
+                          }
+
+                          w.weight = int.tryParse(weightController.text) ?? 0;
+                          w.fat = int.tryParse(fatController.text) ?? 0;
+                          w.muscle = int.tryParse(muscleController.text) ?? 0;
+
+                          await dbHelper.insertWeight(w);
+                          // getHistories();
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // TextField - weight, muscle, fat
+                  Row(
+                    children: [
+                      // weight
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text('몸무게'),
+                            TextField(
+                              controller: weightController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: txtColor, width: 0.5),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // muscle
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text('근육량'),
+                            TextField(
+                              controller: muscleController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: txtColor, width: 0.5),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      //fat
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text('지방'),
+                            TextField(
+                              controller: fatController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: txtColor, width: 0.5),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
           } else {
             return Container();
           }
