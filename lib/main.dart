@@ -5,6 +5,7 @@ import 'package:health_flutter/pages/food.dart';
 import 'package:health_flutter/pages/workout.dart';
 import 'package:health_flutter/style.dart';
 import 'package:health_flutter/utils.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import 'data/data.dart';
 
@@ -38,6 +39,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Workout> workouts = [];
   List<EyeBody> eyeBodies = [];
   List<Weight> weight = [];
+
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
 
   void getHistories() async {
     int _d = Utils.getFormatTime(dateTime);
@@ -79,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           MaterialPageRoute(
                             builder: (ctx) => FoodAddPage(
                               food: Food(
-                                date: Utils.getFormatTime(DateTime.now()),
+                                date: Utils.getFormatTime(dateTime),
                                 time: 1130,
                                 type: 0,
                                 meal: 0,
@@ -101,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             MaterialPageRoute(
                               builder: (ctx) => WorkoutAddPage(
                                 workout: Workout(
-                                  date: Utils.getFormatTime(DateTime.now()),
+                                  date: Utils.getFormatTime(dateTime),
                                   time: 60,
                                   type: 0,
                                   kcal: 0,
@@ -125,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           MaterialPageRoute(
                             builder: (ctx) => EyeBodyAddPage(
                               eyebody: EyeBody(
-                                date: Utils.getFormatTime(DateTime.now()),
+                                date: Utils.getFormatTime(dateTime),
                                 image: '',
                                 memo: '',
                               ),
@@ -163,20 +168,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget getPage() {
     if (currentIndex == 0) {
-      return getHomeWidget(DateTime.now());
+      return getHomeWidget();
+    } else if (currentIndex == 1) {
+      return getHistoryWidget();
     }
 
     return Container();
   }
 
-  Widget getHomeWidget(DateTime date) {
+  Widget getHomeWidget() {
     return Container(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             height: cardSize,
             child: foods.isEmpty
-                ? Image.asset('assets/img/asian_food.jpg')
+                ? Container(
+                    padding: const EdgeInsets.all(8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset('assets/img/asian_food.jpg'),
+                    ),
+                  )
                 : ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: foods.length,
@@ -192,7 +206,13 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             height: cardSize,
             child: workouts.isEmpty
-                ? Image.asset('assets/img/body.jpg')
+                ? Container(
+                    padding: const EdgeInsets.all(8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset('assets/img/body.jpg'),
+                    ),
+                  )
                 : ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: workouts.length,
@@ -216,9 +236,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 } else {
                   if (eyeBodies.isEmpty) {
                     return Container(
-                      height: cardSize,
-                      width: cardSize,
-                      color: mainColor,
+                      padding: const EdgeInsets.all(8),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset('assets/img/3.png'),
+                      ),
                     );
                   }
                   return Container(
@@ -231,6 +253,55 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget getHistoryWidget() {
+    return Container(
+      child: ListView.builder(
+        itemCount: 2,
+        itemBuilder: (ctx, idx) {
+          if (idx == 0) {
+            return Container(
+              child: TableCalendar(
+                // https://dipeshgoswami.medium.com/table-calendar-3-0-0-null-safety-818ba8d4c45e
+                // reference: Flutter table_calendar >= 3.0.0
+                firstDay: DateTime(2021, 1, 1),
+                lastDay: DateTime(2030, 12, 31),
+                focusedDay: _focusedDay,
+                calendarFormat: _calendarFormat,
+                availableCalendarFormats: const {CalendarFormat.twoWeeks: ''},
+                headerStyle: const HeaderStyle(titleCentered: true),
+                onFormatChanged: (format) {
+                  if (_calendarFormat != format) {
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                  }
+                },
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (!isSameDay(_selectedDay, selectedDay)) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  }
+
+                  dateTime = selectedDay;
+                  getHistories();
+                },
+              ),
+            );
+          } else if (idx == 1) {
+            return getHomeWidget();
+          } else {
+            return Container();
+          }
+        },
       ),
     );
   }
