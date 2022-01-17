@@ -175,31 +175,35 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Container(
             height: cardSize,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: foods.length,
-              itemBuilder: (BuildContext ctx, int idx) {
-                return Container(
-                  height: cardSize,
-                  width: cardSize,
-                  child: MainFoodCard(food: foods[idx]),
-                );
-              },
-            ),
+            child: foods.isEmpty
+                ? Image.asset('assets/img/asian_food.jpg')
+                : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: foods.length,
+                    itemBuilder: (BuildContext ctx, int idx) {
+                      return Container(
+                        height: cardSize,
+                        width: cardSize,
+                        child: MainFoodCard(food: foods[idx]),
+                      );
+                    },
+                  ),
           ),
           Container(
             height: cardSize,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: workouts.length,
-              itemBuilder: (BuildContext ctx, int idx) {
-                return Container(
-                  height: cardSize,
-                  width: cardSize,
-                  child: MainWorkoutCard(workout: workouts[idx]),
-                );
-              },
-            ),
+            child: workouts.isEmpty
+                ? Image.asset('assets/img/body.jpg')
+                : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: workouts.length,
+                    itemBuilder: (BuildContext ctx, int idx) {
+                      return Container(
+                        height: cardSize,
+                        width: cardSize,
+                        child: MainWorkoutCard(workout: workouts[idx]),
+                      );
+                    },
+                  ),
           ),
           Container(
             height: cardSize,

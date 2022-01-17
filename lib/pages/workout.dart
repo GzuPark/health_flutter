@@ -314,8 +314,8 @@ class MainWorkoutCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    height: 40,
-                    width: 40,
+                    height: 30,
+                    width: 30,
                     decoration: BoxDecoration(color: inactiveBgColor, borderRadius: BorderRadius.circular(15)),
                     child: Image.asset('assets/img/${workout.type}.png'),
                   ),
