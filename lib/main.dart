@@ -40,7 +40,11 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Workout> workouts = [];
   List<EyeBody> eyeBodies = [];
   List<Weight> weight = [];
-  List<Weight> weights = [];
+
+  List<Food> allFoods = [];
+  List<Workout> allWorkouts = [];
+  List<EyeBody> allEyeBodies = [];
+  List<Weight> allWeights = [];
 
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
@@ -52,7 +56,11 @@ class _MyHomePageState extends State<MyHomePage> {
     workouts = await dbHelper.queryWorkoutByDate(_d);
     eyeBodies = await dbHelper.queryEyeBodyByDate(_d);
     weight = await dbHelper.queryWeightByDate(_d);
-    weights = await dbHelper.queryAllWeight();
+
+    allFoods = await dbHelper.queryAllFood();
+    allWorkouts = await dbHelper.queryAllWorkout();
+    allEyeBodies = await dbHelper.queryAllEyeBody();
+    allWeights = await dbHelper.queryAllWeight();
 
     if (weight.isNotEmpty) {
       final w = weight.first;
@@ -77,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(elevation: 0),
       body: getPage(),
       floatingActionButton: ![0, 1].contains(currentIndex)
           ? Container()
@@ -188,6 +196,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return getHistoryWidget();
     } else if (currentIndex == 2) {
       return getWeightWidget();
+    } else if (currentIndex == 3) {
+      return getStatsWidget();
     }
 
     return Container();
@@ -517,7 +527,7 @@ class _MyHomePageState extends State<MyHomePage> {
           } else if (idx == 2) {
             List<FlSpot> spots = [];
 
-            for (final w in weights) {
+            for (final w in allWeights) {
               if (chartIndex == 0) {
                 spots.add(FlSpot(w.date.toDouble(), w.weight!.toDouble()));
               } else if (chartIndex == 1) {
@@ -639,6 +649,191 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ],
+              ),
+            );
+          } else {
+            return Container();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget getStatsWidget() {
+    return Container(
+      child: ListView.builder(
+        itemCount: 4,
+        itemBuilder: (ctx, idx) {
+          if (idx == 0) {
+            List<FlSpot> spots = [];
+
+            for (final w in allWorkouts) {
+              if (chartIndex == 0) {
+                spots.add(FlSpot(w.date.toDouble(), w.time.toDouble()));
+              } else if (chartIndex == 1) {
+                spots.add(FlSpot(w.date.toDouble(), w.kcal.toDouble()));
+              } else {
+                spots.add(FlSpot(w.date.toDouble(), w.distance.toDouble()));
+              }
+            }
+
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      // weight
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: chartIndex == 0 ? mainColor : inactiveBgColor,
+                          ),
+                          child: Text(
+                            '운동 시간',
+                            style: TextStyle(color: chartIndex == 0 ? Colors.white : inactiveTxtColor),
+                          ),
+                        ),
+                        onTap: () async {
+                          setState(() {
+                            chartIndex = 0;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      // muscle
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: chartIndex == 1 ? mainColor : inactiveBgColor,
+                          ),
+                          child: Text(
+                            'Kcal',
+                            style: TextStyle(color: chartIndex == 1 ? Colors.white : inactiveTxtColor),
+                          ),
+                        ),
+                        onTap: () async {
+                          setState(() {
+                            chartIndex = 1;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      // fat
+                      InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: chartIndex == 2 ? mainColor : inactiveBgColor,
+                          ),
+                          child: Text(
+                            '거리',
+                            style: TextStyle(color: chartIndex == 2 ? Colors.white : inactiveTxtColor),
+                          ),
+                        ),
+                        onTap: () async {
+                          setState(() {
+                            chartIndex = 2;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  // chart
+                  Container(
+                    height: 200,
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [BoxShadow(blurRadius: 6, spreadRadius: 2, color: Colors.black12)],
+                    ),
+                    child: LineChart(
+                      LineChartData(
+                        titlesData: FlTitlesData(
+                          leftTitles: SideTitles(showTitles: false),
+                          rightTitles: SideTitles(showTitles: false),
+                          topTitles: SideTitles(showTitles: false),
+                          bottomTitles: SideTitles(
+                            interval: 1,
+                            showTitles: true,
+                            getTitles: (value) {
+                              DateTime date = Utils.stringToDateTime(value.toInt().toString());
+                              return '${date.day}일';
+                            },
+                          ),
+                        ),
+                        gridData: FlGridData(show: false),
+                        borderData: FlBorderData(show: false),
+                        lineTouchData: LineTouchData(
+                          touchTooltipData: LineTouchTooltipData(
+                            showOnTopOfTheChartBoxArea: false,
+                            getTooltipItems: (spots) {
+                              return [LineTooltipItem('${spots.first.y}', TextStyle(color: mainColor))];
+                            },
+                          ),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            colors: [mainColor],
+                            spots: spots,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else if (idx == 1) {
+            return Container(
+              height: cardSize,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: allFoods.length,
+                itemBuilder: (BuildContext ctx, int _idx) {
+                  return Container(
+                    height: cardSize,
+                    width: cardSize,
+                    child: MainFoodCard(food: allFoods[_idx]),
+                  );
+                },
+              ),
+            );
+          } else if (idx == 2) {
+            return Container(
+              height: cardSize,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: allWorkouts.length,
+                itemBuilder: (BuildContext ctx, int _idx) {
+                  return Container(
+                    height: cardSize,
+                    width: cardSize,
+                    child: MainWorkoutCard(workout: allWorkouts[_idx]),
+                  );
+                },
+              ),
+            );
+          } else if (idx == 3) {
+            return Container(
+              height: cardSize,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: allEyeBodies.length,
+                itemBuilder: (BuildContext ctx, int _idx) {
+                  return Container(
+                    height: cardSize,
+                    width: cardSize,
+                    child: MainEyeBodyCard(eyeBody: allEyeBodies[_idx]),
+                  );
+                },
               ),
             );
           } else {
